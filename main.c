@@ -152,11 +152,11 @@ enum { max_color = 255 };
 /* z value for ray */
 enum { z = 0 };
 
-int NUMTHREADS = 2;
-pthread_mutex_t trace_mutex = PTHREAD_MUTEX_INITIALIZER;
+int NUMTHREADS = 1;
+//pthread_mutex_t trace_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 struct passToThread_struct{
-	int width_pixel, width_pixelEnd;
+	int width_pixelStart, width_pixelEnd;
 	float *res_0T,*res_1T,*res_2T;
 	scene_t *sceneT;
 }f;
@@ -164,7 +164,7 @@ struct passToThread_struct{
 // Starting a thread
 void *trace_thread(void *f){
 	struct passToThread_struct *thread_f = (struct passToThread_struct *)f;
-	int pxStart = thread_f->width_pixel;
+	int pxStart = thread_f->width_pixelStart;
 	int pxEnd = thread_f->width_pixelEnd;
 
 	float *res_0 = (thread_f->res_0T);
@@ -251,12 +251,13 @@ void *trace_thread(void *f){
 			/* write this pixel out to disk. ppm is forgiving about whitespace,
 			 * but has a maximum of 70 chars/line, so use one line per pixel
 			 */
-			pthread_mutex_lock(&trace_mutex);
+			//pthread_mutex_lock(&trace_mutex);
 			res_0[px*width+py] = scaled_color[0];
 			res_1[px*width+py] = scaled_color[1];
 			res_2[px*width+py] = scaled_color[2];
-			pthread_mutex_unlock(&trace_mutex);
+			//pthread_mutex_unlock(&trace_mutex);
 		}
+		fprintf(stderr, "%s %d\n","PRINT:                       Thread finished col:",px);
 	}
 	pthread_exit(0);
 }
@@ -264,6 +265,12 @@ void *trace_thread(void *f){
 int
 main( int argc, char **argv ){
 	/* Write the image format header */
+	int widthStartThread = 15;
+	int widthEndThread = 30;
+
+	int startMain = 0;
+	int endMain= 15;
+
 	scene_t scene = create_sphereflake_scene( sphereflake_recursion );
 
 	float res_0[2600];
@@ -280,17 +287,107 @@ main( int argc, char **argv ){
 		f[px].res_1T = res_1;
 		f[px].res_2T = res_2;
 		f[px].sceneT = &scene;
-		f[px].width_pixel = px*((30/NUMTHREADS)); // 0*15=0 and 1*15=15
-		f[px].width_pixelEnd =(px*((30/NUMTHREADS)))+(30/NUMTHREADS); // 0+15= 15 and 15+15= 30
+		f[px].width_pixelStart = widthStartThread;//px*((30/NUMTHREADS)); // 0*15=0 and 1*15=15
+		f[px].width_pixelEnd = widthEndThread;//(px*((30/NUMTHREADS)))+(30/NUMTHREADS); // 0+15= 15 and 15+15= 30
 			/* create a thread which executes jpeg_finish_compress(&info) */
-		if(pthread_create(&col_thread_variable[px], NULL, trace_thread, &f[px])!=0){ fprintf(stderr, "%s\n","No luck creating thread" ); return 2;}
+		fprintf(stderr, "%s\n","PRINT: Starting Thread");
+		pthread_create(&col_thread_variable[px], NULL, trace_thread, &f[px]);
 	}
 
+	/* Write the image format header */
+	/* P3 is an ASCII-formatted, color, PPM file */
+	Vec3 camera_pos;
+	set( camera_pos, 0., 0., -4. );
+	Vec3 camera_dir;
+	set( camera_dir, 0., 0., 1. );
+	const double camera_fov = 75.0 * (PI/180.0);
+	Vec3 bg_color;
+	set( bg_color, 0.8, 0.8, 1 );
+
+	const double pixel_dx = tan( 0.5*camera_fov ) / ((double)width*0.5);
+	const double pixel_dy = tan( 0.5*camera_fov ) / ((double)height*0.5);
+	const double subsample_dx
+	= halfSamples  ? pixel_dx / ((double)halfSamples*2.0)
+			: pixel_dx;
+	const double subsample_dy
+	= halfSamples ? pixel_dy / ((double)halfSamples*2.0)
+			: pixel_dy;
+
+	/* for every pixel */
+	fprintf(stderr, "%s\n","PRINT: Starting main loop with columns-15");
+	for( int px=startMain; px<endMain; ++px )
+	{
+		const double x = pixel_dx * ((double)( px-(width/2) ));
+		for( int py=0; py<height; ++py )
+		{
+			const double y = pixel_dy * ((double)( py-(height/2) ));
+			Vec3 pixel_color;
+			set( pixel_color, 0, 0, 0 );
+			// fprintf(stderr, "%s\n","PRINT: second loop in main");
+
+			for( int xs=-halfSamples; xs<=halfSamples; ++xs )
+			{
+				for( int ys=-halfSamples; ys<=halfSamples; ++ys )
+				{
+					double subx = x + ((double)xs)*subsample_dx;
+					double suby = y + ((double)ys)*subsample_dy;
+
+					/* construct the ray coming out of the camera, through
+					 * the screen at (subx,suby)
+					 */
+					 ray_t pixel_ray;
+					 copy( pixel_ray.org, camera_pos );
+					 Vec3 pixel_target;
+					 set( pixel_target, subx, suby, z );
+					 sub( pixel_ray.dir, pixel_target, camera_pos );
+					 norm( pixel_ray.dir, pixel_ray.dir );
+
+					 Vec3 sample_color;
+					 copy( sample_color, bg_color );
+					 /* trace the ray from the camera that
+					  * passes through this pixel */
+					 trace( &scene, sample_color, &pixel_ray, 0 );
+					 /* sum color for subpixel AA */
+					 add( pixel_color, pixel_color, sample_color );
+					//  fprintf(stderr, "%s\n","PRINT: after trace");
+				}
+			}
+
+			/* at this point, have accumulated (2*halfSamples)^2 samples,
+			 * so need to average out the final pixel color
+			 */
+			if( halfSamples )
+			{
+				mul( pixel_color, pixel_color,
+						(1.0/( 4.0 * halfSamples * halfSamples ) ) );
+			}
+
+			/* done, final floating point color values are in pixel_color */
+			float scaled_color[3];
+			scaled_color[0] = gamma( pixel_color[0] ) * max_color;
+			scaled_color[1] = gamma( pixel_color[1] ) * max_color;
+			scaled_color[2] = gamma( pixel_color[2] ) * max_color;
+
+			/* enforce caps, replace with real gamma */
+			for( int i=0; i<3; i++)
+				scaled_color[i] = max( min(scaled_color[i], 255), 0);
+
+			/* write this pixel out to disk. ppm is forgiving about whitespace,
+			 * but has a maximum of 70 chars/line, so use one line per pixel
+			 */
+			res_0[px*width + py] = scaled_color[0];
+			res_1[px*width + py] = scaled_color[1];
+			res_2[px*width + py] = scaled_color[2];
+
+		}
+		fprintf(stderr, "%s %d\n","PRINT: Main finished col:",px);
+	}
+	fprintf(stderr, "%s\n","PRINT: Before Join");
 	for( int px=0; px<NUMTHREADS; ++px )
 	{
 		pthread_join(col_thread_variable[px], NULL);
-
 	}
+	fprintf(stderr, "%s\n","PRINT: After Join, starting to print");
 
 	FILE *fp = fopen("res.ppm", "w");
 	fprintf(fp, "P3\n%d %d\n255\n", width, height);
