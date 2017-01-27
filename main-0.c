@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
-#include <pthread.h>
+
 
 static double dirs[6][3] =
 { {1,0,0}, {-1,0,0}, {0,1,0}, {0,-1,0}, {0,0,1}, {0,0,-1} };
@@ -156,23 +156,11 @@ enum { max_color = 255 };
 /* z value for ray */
 enum { z = 0 };
 
-pthread_mutex_t trace_mutex = PTHREAD_MUTEX_INITIALIZER;
+int
+main( int argc, char **argv )
+{
+	scene_t scene = create_sphereflake_scene( sphereflake_recursion );
 
-
-struct passToThread_struct{
-	int width_pixel;
-	float *res_0T,*res_1T,*res_2T;
-	scene_t *sceneT;
-}f;
-
-// Starting a thread
-void *trace_thread(void *f){
-	struct passToThread_struct *thread_f = (struct passToThread_struct *)f;
-	int px = thread_f->width_pixel;
-	float *res_0 = (thread_f->res_0T);
-	float *res_1 = (thread_f->res_1T);
-	float *res_2 = (thread_f->res_2T);
-	scene_t *scene = thread_f->sceneT;
 	/* Write the image format header */
 	/* P3 is an ASCII-formatted, color, PPM file */
 	Vec3 camera_pos;
@@ -192,107 +180,12 @@ void *trace_thread(void *f){
 	= halfSamples ? pixel_dy / ((double)halfSamples*2.0)
 			: pixel_dy;
 
-	const double x = pixel_dx * ((double)( px-(width/2) ));
-	for( int py=0; py<height; ++py )
-	{
-		const double y = pixel_dy * ((double)( py-(height/2) ));
-		Vec3 pixel_color;
-		set( pixel_color, 0, 0, 0 );
-
-		for( int xs=-halfSamples; xs<=halfSamples; ++xs )
-		{
-			for( int ys=-halfSamples; ys<=halfSamples; ++ys )
-			{
-				double subx = x + ((double)xs)*subsample_dx;
-				double suby = y + ((double)ys)*subsample_dy;
-				//fprintf(stderr, "At width %d and height %d and subx %f and suby %d\n",px,py,subx,suby );
-
-				/* construct the ray coming out of the camera, through
-				 * the screen at (subx,suby)
-				 */
-				 ray_t pixel_ray;
-				 copy( pixel_ray.org, camera_pos );
-				 Vec3 pixel_target;
-				 set( pixel_target, subx, suby, z );
-				 sub( pixel_ray.dir, pixel_target, camera_pos );
-				 norm( pixel_ray.dir, pixel_ray.dir );
-
-				 Vec3 sample_color;
-				 copy( sample_color, bg_color );
-				 /* trace the ray from the camera that
-					* passes through this pixel */
-
-				 trace( scene, sample_color, &pixel_ray, 0 );
-
-
-				 /* sum color for subpixel AA */
-				 add( pixel_color, pixel_color, sample_color );
-			}
-		}
-		/* at this point, have accumulated (2*halfSamples)^2 samples,
-		 * so need to average out the final pixel color
-		 */
-		if( halfSamples )
-		{
-			mul( pixel_color, pixel_color,
-					(1.0/( 4.0 * halfSamples * halfSamples ) ) );
-		}
-		/* done, final floating point color values are in pixel_color */
-		float scaled_color[3];
-		scaled_color[0] = gamma( pixel_color[0] ) * max_color;
-		scaled_color[1] = gamma( pixel_color[1] ) * max_color;
-		scaled_color[2] = gamma( pixel_color[2] ) * max_color;
-
-		/* enforce caps, replace with real gamma */
-		for( int i=0; i<3; i++)
-			scaled_color[i] = max( min(scaled_color[i], 255), 0);
-
-		/* write this pixel out to disk. ppm is forgiving about whitespace,
-		 * but has a maximum of 70 chars/line, so use one line per pixel
-		 */
-		pthread_mutex_lock(&trace_mutex);
-		res_0[px*width+py] = scaled_color[0];
-		res_1[px*width+py] = scaled_color[1];
-		res_2[px*width+py] = scaled_color[2];
-		pthread_mutex_unlock(&trace_mutex);
-
-	}
-	//return NULL;
-	pthread_exit(0);
-}
-
-int
-main( int argc, char **argv ){
-	/* Write the image format header */
-	scene_t scene = create_sphereflake_scene( sphereflake_recursion );
-
 	float res_0[2600];
 	float res_1[2600];
 	float res_2[2600];
 
-	pthread_t col_thread_variable[width];
-	struct passToThread_struct f[width];
-	
-	Vec3 camera_pos;
-	set( camera_pos, 0., 0., -4. );
-	Vec3 camera_dir;
-	set( camera_dir, 0., 0., 1. );
-	const double camera_fov = 75.0 * (PI/180.0);
-	Vec3 bg_color;
-	set( bg_color, 0.8, 0.8, 1 );
-
-	const double pixel_dx = tan( 0.5*camera_fov ) / ((double)width*0.5);
-	const double pixel_dy = tan( 0.5*camera_fov ) / ((double)height*0.5);
-	const double subsample_dx
-	= halfSamples  ? pixel_dx / ((double)halfSamples*2.0)
-			: pixel_dx;
-	const double subsample_dy
-	= halfSamples ? pixel_dy / ((double)halfSamples*2.0)
-			: pixel_dy;
-		
-
 	/* for every pixel */
-	for( int px=0; px<29; ++px )
+	for( int px=0; px<width; ++px )
 	{
 		const double x = pixel_dx * ((double)( px-(width/2) ));
 		for( int py=0; py<height; ++py )
@@ -357,28 +250,6 @@ main( int argc, char **argv ){
 		}
 	}
 
-
-
-
-
-	/* for every pixel */
-	int px = 29; //for( int px=0; px<width; ++px )
-	{
-		f[px].res_0T = res_0;
-		f[px].res_1T = res_1;
-		f[px].res_2T = res_2;
-		f[px].sceneT = &scene;
-		f[px].width_pixel = px;
-			/* create a thread which executes jpeg_finish_compress(&info) */
-		pthread_create(&col_thread_variable[px], NULL, trace_thread, &f[px]);
-	}
-
-	px = 29; //for( int px=0; px<width; ++px )
-	{
-		pthread_join(col_thread_variable[px], NULL);
-
-	}
-
 	FILE *fp = fopen("res.ppm", "w");
 	fprintf(fp, "P3\n%d %d\n255\n", width, height);
 
@@ -391,6 +262,7 @@ main( int argc, char **argv ){
 		fprintf(fp, "\n");
 	}
 	fclose(fp);
+
 
 	free_scene( &scene );
 

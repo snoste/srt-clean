@@ -1,3 +1,5 @@
+*.ppm
+m5out/stats.txt
 # Object files
 *.o
 *.ko
