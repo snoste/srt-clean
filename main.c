@@ -273,9 +273,9 @@ int
 main( int argc, char **argv ){
 	/* Write the image format header */
 	int startMain = 0;
-	int endMain= 10;
-	int widthStartThread = 10;
-	int widthEndThread = 20;
+	int endMain= 13;
+	int widthStartThread = 13;
+	int widthEndThread = 18;
 
 	scene_t scene = create_sphereflake_scene( sphereflake_recursion );
 
@@ -296,7 +296,7 @@ main( int argc, char **argv ){
 
 		//First time, these values are initialized for px==o
 		if(px==1){
-			widthStartThread = 20;
+			widthStartThread = 18;
 			widthEndThread = 30;
 		}
 		f[px].threadnum = px;
@@ -306,7 +306,8 @@ main( int argc, char **argv ){
 		fprintf(stderr, "%s %d\n","PRINT: Starting Thread: ",px);
 		pthread_create(&col_thread_variable[px], NULL, trace_thread, &f[px]);
 	}
-
+	widthEndThread = widthStartThread;
+	widthStartThread = endMain;
 	/* Write the image format header */
 	/* P3 is an ASCII-formatted, color, PPM file */
 	Vec3 camera_pos;
@@ -418,6 +419,7 @@ main( int argc, char **argv ){
 		}
 		fprintf(fp, "\n");
 	}
+		fprintf(stderr, "%s\n","PRINT: Done printing ");
 	fclose(fp);
 
 	free_scene( &scene );
