@@ -152,11 +152,11 @@ enum { max_color = 255 };
 /* z value for ray */
 enum { z = 0 };
 
-int NUMTHREADS = 2;
+int NUMTHREADS = 1;
 //pthread_mutex_t trace_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 struct passToThread_struct{
-	int width_pixelStart, width_pixelEnd, width_pixelStart1, width_pixelEnd1, threadnum;
+	int width_pixelStart, width_pixelEnd;
 	float *res_0T,*res_1T,*res_2T;
 	scene_t *sceneT;
 }f;
@@ -166,7 +166,6 @@ void *trace_thread(void *f){
 	struct passToThread_struct *thread_f = (struct passToThread_struct *)f;
 	int pxStart = thread_f->width_pixelStart;
 	int pxEnd = thread_f->width_pixelEnd;
-	int threadnum_f = thread_f -> threadnum;
 
 	float *res_0 = (thread_f->res_0T);
 	float *res_1 = (thread_f->res_1T);
@@ -258,24 +257,19 @@ void *trace_thread(void *f){
 			res_2[px*width+py] = scaled_color[2];
 			//pthread_mutex_unlock(&trace_mutex);
 		}
-		if(threadnum_f==0){
-			fprintf(stderr, "%s %d\n","PRINT:                     Thread 0 finished col:",px);
-		}
-		else{
-			fprintf(stderr, "%s %d\n","PRINT:                                                 Thread 1 finished col:",px);
-		}
+		fprintf(stderr, "%s %d\n","PRINT:                       Thread finished col:",px);
 	}
 	pthread_exit(0);
 }
 
-
 int
 main( int argc, char **argv ){
 	/* Write the image format header */
+	int widthStartThread = 15;
+	int widthEndThread = 30;
+
 	int startMain = 0;
-	int endMain= 10;
-	int widthStartThread = 10;
-	int widthEndThread = 20;
+	int endMain= 15;
 
 	scene_t scene = create_sphereflake_scene( sphereflake_recursion );
 
@@ -293,17 +287,10 @@ main( int argc, char **argv ){
 		f[px].res_1T = res_1;
 		f[px].res_2T = res_2;
 		f[px].sceneT = &scene;
-
-		//First time, these values are initialized for px==o
-		if(px==1){
-			widthStartThread = 20;
-			widthEndThread = 30;
-		}
-		f[px].threadnum = px;
 		f[px].width_pixelStart = widthStartThread;//px*((30/NUMTHREADS)); // 0*15=0 and 1*15=15
 		f[px].width_pixelEnd = widthEndThread;//(px*((30/NUMTHREADS)))+(30/NUMTHREADS); // 0+15= 15 and 15+15= 30
 			/* create a thread which executes jpeg_finish_compress(&info) */
-		fprintf(stderr, "%s %d\n","PRINT: Starting Thread: ",px);
+		fprintf(stderr, "%s\n","PRINT: Starting Thread");
 		pthread_create(&col_thread_variable[px], NULL, trace_thread, &f[px]);
 	}
 
@@ -395,23 +382,18 @@ main( int argc, char **argv ){
 		}
 		fprintf(stderr, "%s %d\n","PRINT: Main finished col:",px);
 	}
-
-
-	fprintf(stderr, "%s\n","PRINT: Starting to print");
+	fprintf(stderr, "%s\n","PRINT: Before Join");
+	for( int px=0; px<NUMTHREADS; ++px )
+	{
+		pthread_join(col_thread_variable[px], NULL);
+	}
+	fprintf(stderr, "%s\n","PRINT: After Join, starting to print");
 
 	FILE *fp = fopen("res.ppm", "w");
 	fprintf(fp, "P3\n%d %d\n255\n", width, height);
 
 	for( int px=0; px<width; ++px )
 	{
-		if(px==widthStartThread){
-			fprintf(stderr, "%s %d %s\n","PRINT: Done printing first ", widthStartThread, " now join first thread");
-			pthread_join(col_thread_variable[0], NULL);
-		}
-		if(px==widthEndThread){
-			fprintf(stderr, "%s %d %s\n","PRINT: Done printing first ", widthEndThread, " now join second thread");
-			pthread_join(col_thread_variable[1], NULL);
-		}
 		for( int py=0; py<height; ++py )
 		{
 			fprintf(fp, "%.0f %.0f %.0f\n", res_0[px*width + py], res_1[px*width + py], res_2[px*width + py]);
