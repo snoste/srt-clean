@@ -280,8 +280,8 @@ main( int argc, char **argv ){
 		f[px].res_1T = res_1;
 		f[px].res_2T = res_2;
 		f[px].sceneT = &scene;
-		f[px].width_pixel = px*((30/NUMTHREADS)-1);
-		f[px].width_pixelEnd =(px*((30/NUMTHREADS)-1))+(30/NUMTHREADS);
+		f[px].width_pixel = px*((30/NUMTHREADS)); // 0*15=0 and 1*15=15
+		f[px].width_pixelEnd =(px*((30/NUMTHREADS)))+(30/NUMTHREADS); // 0+15= 15 and 15+15= 30
 			/* create a thread which executes jpeg_finish_compress(&info) */
 		if(pthread_create(&col_thread_variable[px], NULL, trace_thread, &f[px])!=0){ fprintf(stderr, "%s\n","No luck creating thread" ); return 2;}
 	}
