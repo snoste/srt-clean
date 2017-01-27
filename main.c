@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
-#include <pthread.h>
+
 
 static double dirs[6][3] =
 { {1,0,0}, {-1,0,0}, {0,1,0}, {0,-1,0}, {0,0,1}, {0,0,-1} };
@@ -141,36 +141,26 @@ free_scene( scene_t* arg )
 
 /* how many levels to generate spheres */
 enum { sphereflake_recursion = 0 };
+
 /* output image size */
 enum { height = 30 };
 enum { width = 30 };
+
 /* antialiasing samples, more is higher quality, 0 for no AA */
 enum { halfSamples = 0 };
 /******/
+
 /* color depth to output for ppm */
 enum { max_color = 255 };
+
 /* z value for ray */
 enum { z = 0 };
 
-int NUMTHREADS = 2;
-pthread_mutex_t trace_mutex = PTHREAD_MUTEX_INITIALIZER;
+int
+main( int argc, char **argv )
+{
+	scene_t scene = create_sphereflake_scene( sphereflake_recursion );
 
-struct passToThread_struct{
-	int width_pixel, width_pixelEnd;
-	float *res_0T,*res_1T,*res_2T;
-	scene_t *sceneT;
-}f;
-
-// Starting a thread
-void *trace_thread(void *f){
-	struct passToThread_struct *thread_f = (struct passToThread_struct *)f;
-	int pxStart = thread_f->width_pixel;
-	int pxEnd = thread_f->width_pixelEnd;
-
-	float *res_0 = (thread_f->res_0T);
-	float *res_1 = (thread_f->res_1T);
-	float *res_2 = (thread_f->res_2T);
-	scene_t *scene = thread_f->sceneT;
 	/* Write the image format header */
 	/* P3 is an ASCII-formatted, color, PPM file */
 	Vec3 camera_pos;
@@ -190,8 +180,12 @@ void *trace_thread(void *f){
 	= halfSamples ? pixel_dy / ((double)halfSamples*2.0)
 			: pixel_dy;
 
+	float res_0[2600];
+	float res_1[2600];
+	float res_2[2600];
 
-	for(int px=pxStart; px<pxEnd;++px)
+	/* for every pixel */
+	for( int px=0; px<width; ++px )
 	{
 		const double x = pixel_dx * ((double)( px-(width/2) ));
 		for( int py=0; py<height; ++py )
@@ -206,7 +200,6 @@ void *trace_thread(void *f){
 				{
 					double subx = x + ((double)xs)*subsample_dx;
 					double suby = y + ((double)ys)*subsample_dy;
-					//fprintf(stderr, "At width %d and height %d and subx %f and suby %d\n",px,py,subx,suby );
 
 					/* construct the ray coming out of the camera, through
 					 * the screen at (subx,suby)
@@ -221,15 +214,13 @@ void *trace_thread(void *f){
 					 Vec3 sample_color;
 					 copy( sample_color, bg_color );
 					 /* trace the ray from the camera that
-						* passes through this pixel */
-
-					 trace( scene, sample_color, &pixel_ray, 0 );
-
-
+					  * passes through this pixel */
+					 trace( &scene, sample_color, &pixel_ray, 0 );
 					 /* sum color for subpixel AA */
 					 add( pixel_color, pixel_color, sample_color );
 				}
-		}
+			}
+
 			/* at this point, have accumulated (2*halfSamples)^2 samples,
 			 * so need to average out the final pixel color
 			 */
@@ -238,6 +229,7 @@ void *trace_thread(void *f){
 				mul( pixel_color, pixel_color,
 						(1.0/( 4.0 * halfSamples * halfSamples ) ) );
 			}
+
 			/* done, final floating point color values are in pixel_color */
 			float scaled_color[3];
 			scaled_color[0] = gamma( pixel_color[0] ) * max_color;
@@ -251,45 +243,11 @@ void *trace_thread(void *f){
 			/* write this pixel out to disk. ppm is forgiving about whitespace,
 			 * but has a maximum of 70 chars/line, so use one line per pixel
 			 */
-			pthread_mutex_lock(&trace_mutex);
-			res_0[px*width+py] = scaled_color[0];
-			res_1[px*width+py] = scaled_color[1];
-			res_2[px*width+py] = scaled_color[2];
-			pthread_mutex_unlock(&trace_mutex);
+			res_0[px*width + py] = scaled_color[0];
+			res_1[px*width + py] = scaled_color[1];
+			res_2[px*width + py] = scaled_color[2];
+
 		}
-	}
-	pthread_exit(0);
-}
-
-int
-main( int argc, char **argv ){
-	/* Write the image format header */
-	scene_t scene = create_sphereflake_scene( sphereflake_recursion );
-
-	float res_0[2600];
-	float res_1[2600];
-	float res_2[2600];
-
-	pthread_t col_thread_variable[NUMTHREADS];
-	struct passToThread_struct f[NUMTHREADS];
-
-	/* for every pixel */
-	for( int px=0; px<NUMTHREADS; ++px )
-	{
-		f[px].res_0T = res_0;
-		f[px].res_1T = res_1;
-		f[px].res_2T = res_2;
-		f[px].sceneT = &scene;
-		f[px].width_pixel = px*((30/NUMTHREADS)-1);
-		f[px].width_pixelEnd =(px*((30/NUMTHREADS)-1))+(30/NUMTHREADS);
-			/* create a thread which executes jpeg_finish_compress(&info) */
-		if(pthread_create(&col_thread_variable[px], NULL, trace_thread, &f[px])!=0){ fprintf(stderr, "%s\n","No luck creating thread" ); return 2;}
-	}
-
-	for( int px=0; px<NUMTHREADS; ++px )
-	{
-		pthread_join(col_thread_variable[px], NULL);
-
 	}
 
 	FILE *fp = fopen("res.ppm", "w");
@@ -304,6 +262,7 @@ main( int argc, char **argv ){
 		fprintf(fp, "\n");
 	}
 	fclose(fp);
+
 
 	free_scene( &scene );
 
