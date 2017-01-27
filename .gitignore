@@ -1,3 +1,6 @@
+m5out/*
+srt
+
 # Object files
 *.o
 *.ko

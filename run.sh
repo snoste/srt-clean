@@ -1,3 +1,4 @@
+time
 make clean
 make
 ./srt
