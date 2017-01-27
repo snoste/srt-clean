@@ -88,11 +88,20 @@ The results is shown in figure \ref{fig:valgrind}
 	\label{fig:valgrind}
 \end{figure}
 
-This results gives the hint of divide the code inside the CPUs onto different cores, after the main function.\\
+This results gives the hint of divide the code inside the CPUs onto different cores, after the main function. This paper is divided onto different section, the first part concern the Gem5 simulator and Pthread library. The other section explain and evaluate different application results.\\
  
-\hfill January 15, 2017
+\hfill January 27, 2017
 
-\section{First Part}
+
+\section{Gem5 and Pthread library}
+Gem5 is the simulator used for testing the effectiveness and the results of the changes made on the code. The metric for evaluate the performances are the "tick". Tick are the results that gem5 displayed after every simulation and represent the total execution time in picoseconds. 
+The simulator can both work in Full System mode and Syscall Emulation mode \(SE mode\). One one hand, in Full System mode the system it is much more accurate but it require also an higher amount of time for run the simulation, in this case it is possible to boot an entire OS from scratch. On the other hand, in \(SE mode\) the system is less accurate but is much faster.
+In this paper it is used only the \(SE mode\) because it is of interest evaluate an approximate results of the improved performance instead of an accurate analysis.
+
+
+
+
+\section{Function on thread}
 
 What as been done firstly is try to run on the two architecture without change any code, the results has been the following:
 23714598000 number of tick for the 3 a9 cores and 18786430000. 
@@ -102,7 +111,7 @@ On one thred the jpeg\_finish\_compress there are the same results for 3 a9 2364
 
 
 
-\section{Second Part}
+\section{New application}
 Due to the complexity of the jpeg compressing function we have decided to change to the same type of application but exploited in a simple manner. The new Program calls tree it can be seen in Figure \ref{fig:valgrind2}
 
 \begin{figure}[!h]
@@ -112,6 +121,8 @@ Due to the complexity of the jpeg compressing function we have decided to change
 	\label{fig:valgrind2}
 \end{figure}
 
+
+\
 
 \section{appendix}
 \subsection{scripts}
