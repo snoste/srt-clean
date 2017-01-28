@@ -157,10 +157,16 @@ Due to the complexity of the jpeg compressing function we have decided to change
 \section{Pixels line on thread}
 The final application threaten in this report has been inspired directly from the application itself. Moreover, instead of using Valgrind for dividing the code, the authors have questioned what the Jpeg compression was doing. On behalf of this, the code was actually possible to divide among the all pixels line that the function was making as output. Therefore, the line of the picture where divided into different thread. Multiple discussion has been created and reported on this section.
 Firstly, a thread for each pixels line has been created. The idea was to created multiple thread and then let the compiler divide them among all the cores. 
-In order to do so, the function:
-
+In order to do so, it has been created a function pthread\_create and a line of the picture was placed on a thread.
 
 However, because of gem5 was running in SE mode, it was not possible to create more thread that the cores available and then a different type of code has been created, tailored with the used CPU.
+The results can be seen in figure \ref{fig:a9a9a9} for the 3 a9 processor, and in figure \ref{fig:a15a9} for the a15-a9 processor. As it is possible to see the overall performances where decreased of about 1\% and 2\% respectively.
+As next step, the picture has been divided equally between the main and another thread. The result where already satisfactory with an increase in performance of 42\% in the 3 A9 processor and 17\% on the A15-A9 processor.
+Finally, it has been created a different application for the two processor for use as much as possible the available resources. On the A15-A9 processor in fact, it has been allocated more pixel line on the first A15 core more powerful that the secondary A9. Splitting the code in 2/3 and 1/3 respectively for the A15 and A9 core the final results was a 23\% of increase in overall performance.
+On the other hand, for the triple A9 processor the application was slightly different: because the availability of the three cores, the thread created where three in this case. It has also been seen after some simulation and by printing on screen the order of execution of each pixel line, that the performance increase was much higher if instead of creating a balanced amount of pixels line into each thread, was quite better to create an unbalanced one. In fact we allocated 13 line on the first core, 6 on the second and 11 on the third one. The result was 58\% better in performance.
+
+
+
 
 \begin{figure}[!h]
 	\centering
