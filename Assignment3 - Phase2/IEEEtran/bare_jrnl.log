@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9.6100 64-bit) (preloaded format=pdflatex 2016.12.28)  27 JAN 2017 18:08
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9.6100 64-bit) (preloaded format=pdflatex 2016.12.28)  28 JAN 2017 12:37
 entering extended mode
 **./bare_jrnl.tex
 (bare_jrnl.tex
@@ -703,7 +703,7 @@ LaTeX Info: Redefining \nameref on input line 44.
 \openout5 = `bare_jrnl.out'.
 
 
-<valgrind.jpeg, id=32, 1018.80624pt x 761.84625pt>
+<valgrind.jpeg, id=44, 1018.80624pt x 761.84625pt>
 File: valgrind.jpeg Graphic file (type jpg)
  <use valgrind.jpeg>
 Package pdftex.def Info: valgrind.jpeg used on input line 86.
@@ -718,72 +718,99 @@ Underfull \hbox (badness 10000) in paragraph at lines 91--92
 
  []
 
-LaTeX Font Info:    Try loading font information for U+msa on input line 98.
+LaTeX Font Info:    Try loading font information for U+msa on input line 99.
 ("C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsa.fd"
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 98.
+LaTeX Font Info:    Try loading font information for U+msb on input line 99.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsb.fd"
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Try loading font information for U+wasy on input line 98.
+LaTeX Font Info:    Try loading font information for U+wasy on input line 99.
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\wasysym\uwasy.fd"
 File: uwasy.fd 2003/10/30 v2.0 Wasy-2 symbol font definitions
 )
-<valgrind2.jpg, id=34, 235.37938pt x 357.335pt>
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 106.
+
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\psnfss\ot1pcr.fd"
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+)
+Overfull \hbox (8.09973pt too wide) in paragraph at lines 109--110
+[][][][][][][][][][][][][][] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 113--117
+
+ []
+
+[1{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}
+
+
+ <./valgrind.jpeg>]
+<valgrind2.jpg, id=71, 235.37938pt x 357.335pt>
 File: valgrind2.jpg Graphic file (type jpg)
  <use valgrind2.jpg>
-Package pdftex.def Info: valgrind2.jpg used on input line 119.
+Package pdftex.def Info: valgrind2.jpg used on input line 151.
 (pdftex.def)             Requested size: 201.60077pt x 306.05893pt.
+
+<a9a9a9.jpg, id=72, 204.765pt x 351.3125pt>
+File: a9a9a9.jpg Graphic file (type jpg)
+ <use a9a9a9.jpg>
+Package pdftex.def Info: a9a9a9.jpg used on input line 167.
+(pdftex.def)             Requested size: 201.60077pt x 345.90814pt.
+
+<a15a9.jpg, id=73, 208.27812pt x 355.3275pt>
+File: a15a9.jpg Graphic file (type jpg)
+ <use a15a9.jpg>
+Package pdftex.def Info: a15a9.jpg used on input line 174.
+(pdftex.def)             Requested size: 201.60077pt x 343.95155pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-LaTeX Font Info:    Try loading font information for OT1+pcr on input line 129.
-
-("C:\Program Files\MiKTeX 2.9\tex\latex\psnfss\ot1pcr.fd"
-File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
-) [1{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}
-
-
- <./valgrind.jpeg>]
-Overfull \hbox (6.00262pt too wide) in paragraph at lines 152--153
+[2 <./valgrind2.jpg> <./a9a9a9.jpg>]
+Overfull \hbox (6.00262pt too wide) in paragraph at lines 205--206
 [][][][][][][][][][][][][][][][][] 
  []
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 183.
-[2
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 236.
+[3
 
- <./valgrind2.jpg>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 183.
+ <./a15a9.jpg>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 236.
  (bare_jrnl.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 183.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 183.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 236.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 236.
 Package rerunfilecheck Info: File `bare_jrnl.out' has not changed.
-(rerunfilecheck)             Checksum: 1FDA55C9C6D6609712C2C59020E99A08;360.
+(rerunfilecheck)             Checksum: 96030CBB0503DB32E48F26049F8D6A97;547.
 Package logreq Info: Writing requests to 'bare_jrnl.run.xml'.
 \openout1 = `bare_jrnl.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 14816 strings out of 493333
- 239882 string characters out of 3139187
- 723352 words of memory out of 3000000
- 18125 multiletter control sequences out of 15000+200000
+ 14847 strings out of 493333
+ 240277 string characters out of 3139187
+ 721462 words of memory out of 3000000
+ 18138 multiletter control sequences out of 15000+200000
  40221 words of font info for 80 fonts, out of 3000000 for 9000
  1144 hyphenation exceptions out of 8191
- 36i,7n,35p,854b,1618s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 36i,7n,35p,854b,1614s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/base/8r.enc}<C:/Program Files/Mi
 KTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Files/MiKTeX 2.9
-/fonts/type1/urw/courier/ucrr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/ur
-w/times/utmb8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmbi8a.p
-fb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Fi
-les/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on bare_jrnl.pdf (2 pages, 278769 bytes).
+/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX 2.9/fonts/ty
+pe1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/publ
+ic/amsfonts/cm/cmsy7.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/courier/u
+crr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Pro
+gram Files/MiKTeX 2.9/fonts/type1/urw/times/utmbi8a.pfb><C:/Program Files/MiKTe
+X 2.9/fonts/type1/urw/times/utmr8a.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1
+/urw/times/utmri8a.pfb>
+Output written on bare_jrnl.pdf (3 pages, 390714 bytes).
 PDF statistics:
- 125 PDF objects out of 1000 (max. 8388607)
- 51 named destinations out of 1000 (max. 500000)
- 67 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 170 PDF objects out of 1000 (max. 8388607)
+ 67 named destinations out of 1000 (max. 500000)
+ 101 words of extra memory for PDF output out of 10000 (max. 10000000)
 
