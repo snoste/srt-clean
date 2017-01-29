@@ -61,35 +61,31 @@
 % As a general rule, do not put math, special symbols or citations
 % in the abstract or keywords.
 \begin{abstract}
-Performance evaluation of the same application mapped onto different cores. The application is a Jpeg encoder program. The CPU used are an ARM A15-ARM A9 and a triple A9 cores. The program it has been divided used a profiler but also just by looking at the application itself. 
+Performance evaluation of an application mapped onto multiple cores. The application is ray tracing. The CPU setups used are; ARM A15 and ARM A9 and triple ARM A9 cores. The program it has been divided used a profiler but also just by looking at the application itself. 
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-ARM a9, ARM a15, gem5, multi threads, Valgrind 
+ARM A9, ARM A15, GEM5, Pthreads C library, Valgrind, Ray Tracing, Simulation
 \end{IEEEkeywords}
-
-
 
 
 \IEEEpeerreviewmaketitle
 
-
-
 \section{Introduction}
 
-IEEEPARstart{T}{his} paper shows performance evaluation of the same application, a jpeg encoder, onto two different processors. Those two processors are composed differently. The first is a 3 ARM a9 core CPU. The second has one ARM a15 core and an ARM a9 core inside it.
-On one hand, there is a CPU composed by an A9 core associated with a more powerful one. On the other hand, a CPU composed by balanced cores.
-The first step done it was to analyze the given application. For this task, Valgrind program has been used.
-The results is shown in figure \ref{fig:valgrind}
+\IEEEPARstart{T}{his} paper shows performance evaluation of an application, ray tracing\footnote{\hyperref{https://en.wikipedia.org/wiki/Ray_tracing_(graphics)}{}{Ray Tracing}{Wiki page for Ray Tracing}}, onto two different multiprocessor setup. Those two setups are composed firstly there are three ARM A9 core CPUs. The second one has an ARM A15 and an ARM A9 core.
+To describe the difference first one has three as powerful balanced cores but the later has one more powerful, the A15, and one A9.
+The first step was to analyze the given process. For this task Valgrind was used.
+The initial results is shown in figure \ref{fig:valgrind}.
 
 \begin{figure}[!h]
 	\includegraphics[width=\linewidth]{valgrind}
 	\caption{Program calls in Valgrind}
 	\label{fig:valgrind}
-\end{figure}
+\end{figure} 
 
-This results gives the hint of divide the code inside the CPUs onto different cores, after the main function. This paper is divided onto different section, the first part concern the Gem5 simulator and Pthread library. The other section explains and evaluate different application results.\\
+This results gives the hint of how to divide the code onto the different cores and CPU architecture. This paper is divided onto two main sections, the first part concerning the Gem5 simulator and the Pthread library. The other section explains and evaluates result of using those tools and how it was done.\\
 
  
 \hfill January 27, 2017
@@ -97,12 +93,15 @@ This results gives the hint of divide the code inside the CPUs onto different co
 
 \section{Gem5 and Pthread library}
 \subsection{Gem5 simulator}
-Gem5 is the simulator used for testing the effectiveness and the results of the changes made on the code. The metric for evaluate the performances are the "tick". Tick are the results that gem5 displayed after every simulation and represent the total execution time in picoseconds. 
-The simulator can both work in Full System mode and Syscall Emulation mode \(SE mode\). On one hand, in Full System mode the system it is much more accurate but it requires also a higher amount of time for run the simulation, in this case it is possible to boot an entire OS from scratch. On the other hand, in \(SE mode\) the system is less accurate but is much faster.
-In this paper it is used only the \(SE mode\) because it is of interest evaluate an approximate results of the improved performance instead of an accurate analysis.
+Gem5 is a simulator, here used to simulate the different CPU architectures. The effectiveness and the results of the changes made on the code can be observed when running the code on the architectures with different modifications. 
+
+The metric for evaluating the performances are so called "ticks". Ticks are the results that gem5 displays after every simulation and represent the total execution time in picoseconds on the simulated hardware.
+ 
+The simulator can both work in Full System mode and Syscall Emulation mode \(SE mode\). On one hand, in Full System mode the system it is much more accurate but it requires also a higher amount of time for run the simulation, in this case it is possible to boot an entire OS from scratch. On the other hand, in \(SE mode\) the system is less accurate but is much faster were it does not boot the OS, rather uses the host machine.
+In this paper the \(SE mode\) is used because it is of interest evaluate an approximate results of the improved performance of this specific process instead of an accurate analysis of the whole system. If making an end product it would be wise to use the Full system mode later on for further enhancements on stability and power consumption.
 \subsection{Pthread library}
-To divide the code into different threads, the Posix Thread library has been used.
-The library is composed mainly by these three functions:
+To divide the code into different threads, the Posix Thread library (pthread) was used.
+The library can be used for advanced multi threading with various settings and easy to use API calls. In this assignment, mainly three of these functions were used:
 
 \begin{itemize}
 	\item pthread\_create	
@@ -112,44 +111,47 @@ int pthread_create(pthread_t * thread,
 	void * (*start_routine)(void *), 
 	void *arg);
 \end{lstlisting}
-
-The function is needed to create new thread. 
-The variable \(thread\) returns the thread ID. \(Attr\) it is possible to gives different attribute to the thread, set to NULL for default.
-\(*start\_routine\) is the pointer to a function to be threaded. 
-\(*arg\) is the argument to pass to the function. In order to pass multiple arguments, it is needed to create a struct and pass the struct as it has been done later on the report.\\
-
+This function is needed to create new thread and the input into this function are constructed as follows:
+\begin{itemize}
+	\item The variable \(thread\) returns the thread ID. 
+	\item \(Attr\) it is possible to gives different attribute to the thread, but set to NULL by default.
+	\item \(*start\_routine\) is the pointer to a function which contains the commands which run on the thread. 
+	\item \(*arg\) is the argument to pass to the function. In order to pass multiple arguments, it is needed to create a structure, struct, and pass the struct as it has been done later on the report.\\
+\end{itemize}
 
 	\item pthread\_join
 \begin{lstlisting}
 int pthread_join(pthread_t th, 
 	void **thread_return);
 \end{lstlisting}
-In this function a thread is suspended till \(th\) terminates. \(thread\_return\) return from the function.
-This function it is used for waiting the end of a thread.
+In this function a thread is suspended until \(th\) terminates. \(thread\_return\) returns from the function.
+This function is used in order to wait until the specific thread has finished executing.
 	\item pthread\_exit
 \begin{lstlisting}
 void pthread_exit(void *retval);
 \end{lstlisting}
-This terminate a thread, where \(*retval\) return the value of the function.
+This terminates a thread, where \(*retval\) returns the value of the function.
 \end{itemize}
-This description has been taken from\\
+This description was reviewed from:\\
  \(http://www.yolinux.com/\)
 
 
 
-\section{Function on thread}
+\section{Optimizing Using Threads}
 
-What has been done firstly, is it try to run on the two architecture without change any code, the results have been the following:
-23714598000 number of tick for the 3 a9 cores and 18786430000. 
+There were two applications used but the first one was aborted due to large and very spread code size. It was difficult to enhance and work with that code. Some progress was made for that application as can be seen in Subsection \ref{sec:jpeg}
+
+\subsection{JPEG - First application}
+\label{sec:jpeg}
+When starting the optimization of the code and putting it onto threads, both architecture were simulated without any change to the code, the results are the following:
+23714598000 number of ticks for the triple A9 cores and 18786430000 for the A15 and A9. 
 Now, the jpeg finish compression has been placed in another thread, for doing so the following tutorial has been used: http://timmurphy.org/2010/05/04/pthreads-in-c-a-minimal-working-example/
 
 On one thread the jpeg\_finish\_compress there are the same results for 3 a9 23641697000 and 21533576000 for a15-a9
 
 
-
-
-\section{New application}
-Due to the complexity of the jpeg compressing function we have decided to change to the same type of application but exploited in a simple manner. The new Program calls tree it can be seen in Figure \ref{fig:valgrind2}
+\subsection{Ray Tracing - New application }
+Due to the complexity of the jpeg compressing function it was decided to change to a different application but exploited in a simple manner. The new Program calls tree, from valgrind, can seen in Figure \ref{fig:valgrind2}
 
 \begin{figure}[!h]
 	\centering
@@ -159,11 +161,10 @@ Due to the complexity of the jpeg compressing function we have decided to change
 \end{figure}
 
 
-\section{Pixels' line on thread}
-The final application threaten in this report has been inspired directly from the application itself. Moreover, instead of using Valgrind for dividing the code, the authors have questioned what the Jpeg compression was doing. On behalf of this, the code was possible to divide among the all pixels’ line that the function was making as output. Therefore, the line of the picture where divided into different thread. Multiple discussion has been created and reported on this section.
-Firstly, a thread for each pixels’ line has been created. The idea was to created multiple thread and then let the compiler divide them among all the cores. 
-To do so, it has been created a function pthread\_create for computing a line of the picture.
-For doing so, a struct where all the variable needed to be passed to the thread, has been created:
+Valgrind was first used to find the relevant functions to be utilized in threads. That showed that approximately 70\% of the effort went to printing to the image file and 30\% went to the actual tracing. First approach the tracing function and move it to another thread. It sounds like a brilliant idea to have one tread doing the trace but in practice, many changes have to be made in order to do that were for every pixel the function is called. A great overhead would have mean created with that.
+
+Thus next thought was to divided the lines to different threads. Firstly, a thread for each pixels’ line has been created. The idea was to created multiple thread and then let the compiler divide them among all the cores. A thread (one or two) was created and passed any number of threads in any segment of the picture. Ofcourse passing equal amount of pixels(lines) to each thread would make sense but that was not the case. That will be discussed further in the results, in Section \ref{sec:res}.
+For doing passing multiple arguments to a thread with pthread\_create a struct had to be defined;
 \begin{lstlisting}
 struct passToThread_struct{
 int width_pixel;
@@ -210,6 +211,9 @@ On the other hand, for the triple A9 processor the application was slightly diff
 	\label{fig:a15a9}
 \end{figure}
 
+\section{Results and discussion}
+\label{sec:res}
+
 
 \section{appendix}
 \subsection{scripts}
@@ -223,7 +227,7 @@ cd /
 \end{lstlisting}
 
 \begin{lstlisting}
-#/bin/sh!
+#!/bin/sh
 cd /home/$USER/srt-clean
 make clean
 make
@@ -231,7 +235,7 @@ cd /
 \end{lstlisting}
 
 \begin{lstlisting}
-#/bin/sh!
+#!/bin/sh
 cd /home/$USER/srt-clean
 make clean
 make -f Makefile.arm
@@ -243,7 +247,7 @@ cd /
 \end{lstlisting}
 
 \begin{lstlisting}
-#/bin/sh!
+#!/bin/sh
 cd /home/$USER/jpeg/jpeg-6a/
 make clean
 make -f Makefile.arm
@@ -256,7 +260,7 @@ cd /
 
 
 \begin{lstlisting}
-#/bin/sh!
+#!/bin/sh
 cd /home/$USER/srt-clean
 make clean
 make -f Makefile.arm
