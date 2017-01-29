@@ -159,7 +159,7 @@ Due to the complexity of the jpeg compressing function we have decided to change
 \end{figure}
 
 
-\section{Pixels line on thread}
+\section{Pixels' line on thread}
 The final application threaten in this report has been inspired directly from the application itself. Moreover, instead of using Valgrind for dividing the code, the authors have questioned what the Jpeg compression was doing. On behalf of this, the code was possible to divide among the all pixels’ line that the function was making as output. Therefore, the line of the picture where divided into different thread. Multiple discussion has been created and reported on this section.
 Firstly, a thread for each pixels’ line has been created. The idea was to created multiple thread and then let the compiler divide them among all the cores. 
 To do so, it has been created a function pthread\_create for computing a line of the picture.
