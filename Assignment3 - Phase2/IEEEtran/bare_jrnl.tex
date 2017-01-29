@@ -164,7 +164,7 @@ Due to the complexity of the jpeg compressing function it was decided to change 
 Valgrind was first used to find the relevant functions to be utilized in threads. That showed that approximately 70\% of the effort went to printing to the image file and 30\% went to the actual tracing. First approach the tracing function and move it to another thread. It sounds like a brilliant idea to have one tread doing the trace but in practice, many changes have to be made in order to do that were for every pixel the function is called. A great overhead would have mean created with that.
 
 Thus next thought was to divided the lines to different threads. Firstly, a thread for each pixels’ line has been created. The idea was to created multiple thread and then let the compiler divide them among all the cores. A thread (one or two) was created and passed any number of threads in any segment of the picture. Ofcourse passing equal amount of pixels(lines) to each thread would make sense but that was not the case. That will be discussed further in the results, in Section \ref{sec:res}.
-For doing passing multiple arguments to a thread with pthread\_create a struct had to be defined;
+For passing multiple arguments to a thread with pthread\_create a struct had to be defined;
 \begin{lstlisting}
 struct passToThread_struct{
 int width_pixel;
