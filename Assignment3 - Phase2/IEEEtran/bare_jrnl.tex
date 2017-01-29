@@ -163,38 +163,42 @@ Due to the complexity of the jpeg compressing function it was decided to change 
 
 Valgrind was first used to find the relevant functions to be utilized in threads. That showed that approximately 70\% of the effort went to printing to the image file and 30\% went to the actual tracing. First approach the tracing function and move it to another thread. It sounds like a brilliant idea to have one tread doing the trace but in practice, many changes have to be made in order to do that were for every pixel the function is called. A great overhead would have mean created with that.
 
-Thus next thought was to divided the lines to different threads. Firstly, a thread for each pixels’ line has been created. The idea was to created multiple thread and then let the compiler divide them among all the cores. A thread (one or two) was created and passed any number of threads in any segment of the picture. Ofcourse passing equal amount of pixels(lines) to each thread would make sense but that was not the case. That will be discussed further in the results, in Section \ref{sec:res}.
+Thus next thought was to divided the lines to different threads. Firstly, a thread for each pixels’ line has been created. However, because of gem5 was running in SE mode, it was not possible to create more threads than the cores available. Then the idea was to created one or two extra threads, besides main, and then let the compiler divide them among all the cores. A thread (one or two) was created and passed any number of threads in any segment of the picture. Ofcourse passing equal amount of pixels(lines) to each thread would make sense but that was not the case. That will be discussed further in the results, in Section \ref{sec:res}.
 For passing multiple arguments to a thread with pthread\_create a struct had to be defined;
-\begin{lstlisting}
+\begin{lstlisting}[language=C,caption={Struct for thread defined}]
 struct passToThread_struct{
-int width_pixel;
-float *res_0T,*res_1T,*res_2T;
-scene_t *sceneT;
+    int width_pixelStart, width_pixelEnd,
+         threadnum;
+    float *res_0T,*res_1T,*res_2T;
+    scene_t *sceneT;
 }f;
 \end{lstlisting}
-On the main, a normal iteration where left as it was on the code, then a new pixels’ line computation where created. After assign all the variable to pass, the pthread function where invoked:
-\begin{lstlisting}
+In the main, a normal iteration where left as it was on the code, then a new pixels' line computation where created. After assigning all the variable to pass, the pthread function/s were invoked:
+\begin{lstlisting}[language=c,caption={Creating threads}]
 pthread_create(&col_thread_variable[px],
 NULL, trace_thread, &f[px]);
 \end{lstlisting} 
-then the instance 
-\begin{lstlisting}
+Then the joining after all iterations in the end of main, before printing.  
+\begin{lstlisting}[language=c,caption={Joining threads }]
 pthread_join(col_thread_variable[px], 
 NULL);
 \end{lstlisting}
 For join the thread to the main one.
 The \(trace_thread\) function was created by adapting the code of the main used for calculate a line of pixel.\\
 
-The code was now ready to be run using the script on the appendix.
-However, because of gem5 was running in SE mode, it was not possible to create more thread that the cores available and then a different type of code has been created, tailored with the used CPU.
-The results can be seen in figure \ref{fig:a9a9a9} for the 3 a9 processor, and in figure \ref{fig:a15a9} for the a15-a9 processor. As it is possible to see the overall performances where decreased of about 1\% and 2\% respectively.
-As next step, the picture has been divided equally between the main and another thread. The result where already satisfactory with an increase in performance of 42\% in the 3 A9 processor and 17\% on the A15-A9 processor.\\
-
-Finally, it has been created a different application for the two processors for use as much as possible the available resources. On the A15-A9 processor in fact, it has been allocated more pixel line on the first A15 core more powerful that the secondary A9. Splitting the code in 2/3 and 1/3 respectively for the A15 and A9 core the results was a 23\% of increase in overall performance.
-On the other hand, for the triple A9 processor the application was slightly different: because the availability of the three cores, the thread created where three in this case. It has also been seen after some simulation and by printing on screen the order of execution of each pixel line, that the performance increase was much higher if instead of creating a balanced number of pixels’ line into each thread, was quite better to create an unbalanced one. In fact, we allocated 13 line on the first core, 6 on the second and 11 on the third one. The result was 58\% better in performance.
+The code was now ready to be run using the scripts noted on the appendix.
 
 
 
+\subsubsection{Which lines to divide?}
+\label{sec:res}
+To make sure that the previously mention methodology would work, one line was put on one thread besides the main function. The results can be seen in figure \ref{fig:a9a9a9} for the triple A9 processor, and in Figure \ref{fig:a15a9} for the A15-A9 processor. It is possible to see that the overall performances decreased about 1\% and 2\% respectively.
+
+Now when the method works, further modification can be made. As next step, the picture was divided equally between the main and another thread/s. The result where already somewhat satisfactory with an increase in performance of 42\% in the 3 A9 processor and 17\% on the A15-A9 processor.\\
+
+Finally, for maximized results using this method: On the A15-A9 processor in fact, more line were allocated on the first A15 core than the secondary A9 core. Splitting the code in 2/3 and 1/3 respectively for the A15 and A9 core the results was a 23\% of increase in overall performance.
+
+On the other hand, for the triple A9 processor the application was slightly different: because the availability of the three cores, the thread created where three in this case. It has also been seen after some simulation and by printing on screen the order of execution of each pixel line, that the performance increase was much higher if instead of creating a balanced number of pixels’ line into each thread, was quite better to create an unbalanced one. In fact, we allocated 13 line on the first core, 6 on the second and 11 on the third one. The result was 58\% better in performance. Why could this have been? It would make sense that equal line division would be best, but due to this exact picture, there is more calculation to be performed in the middle range pixels. Thus it takes more effort and calculation of six lines will be equivalent of thirteen.
 
 
 \begin{figure}[!h]
@@ -211,13 +215,29 @@ On the other hand, for the triple A9 processor the application was slightly diff
 	\label{fig:a15a9}
 \end{figure}
 
-\section{Results and discussion}
-\label{sec:res}
+
+Another feature was added, namely to let the main start printing to the file as soon as the parts are finished. So for example when 10 lines are finished calculating by the main, they are printed to the file and after that point, the first thread is joined. Then wait for it to finish its lines and print then, so forth.
+
+By debugging via printing, is how it was figured out that more calculation was done in the middle. In Figure \ref{fig:printingbad]} and \ref{fig:printinggood]} are some picture of process flow, showed by printing useful messages about the status of the process. 
 
 
-\section{appendix}
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=.99\linewidth]{printing-bad}
+	\caption{The process of the modified program. This shows three threads being simulated and equal amount on each thread}
+	\label{fig:printingbad}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=.99\linewidth]{printing-good}
+	\caption{The process of the modified program. This shows three threads being simulated with less lines on one of the threads}
+	\label{fig:printinggood}
+\end{figure}
+
+\section{Appendix A}
 \subsection{scripts}
-\begin{lstlisting}
+\begin{lstlisting}[language=bash,caption={bash}]
 #!/bin/sh
 cd /home/$USER/srt-clean
 sudo rm callgrind.out.*
@@ -226,7 +246,7 @@ kcachegrind callgrind.out.*
 cd /
 \end{lstlisting}
 
-\begin{lstlisting}
+\begin{lstlisting}[language=bash,caption={bash}]
 #!/bin/sh
 cd /home/$USER/srt-clean
 make clean
@@ -234,7 +254,7 @@ make
 cd /
 \end{lstlisting}
 
-\begin{lstlisting}
+\begin{lstlisting}[language=bash,caption={bash}]
 #!/bin/sh
 cd /home/$USER/srt-clean
 make clean
@@ -246,7 +266,7 @@ make -f Makefile.arm
 cd /
 \end{lstlisting}
 
-\begin{lstlisting}
+\begin{lstlisting}[language=bash,caption={bash}]
 #!/bin/sh
 cd /home/$USER/jpeg/jpeg-6a/
 make clean
@@ -259,7 +279,7 @@ cd /
 \end{lstlisting}
 
 
-\begin{lstlisting}
+\begin{lstlisting}[language=bash,caption={bash}]
 #!/bin/sh
 cd /home/$USER/srt-clean
 make clean

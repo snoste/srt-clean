@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.9.10)  29 JAN 2017 15:18
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.9.10)  29 JAN 2017 16:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -756,70 +756,103 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ™ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
-Missing character: There is no â in font ptmr7t!
-Missing character: There is no € in font ptmr7t!
-Missing character: There is no ™ in font ptmr7t!
-
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2015/06/04 1.6 listings language file
+)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2015/06/04 1.6 (Carsten Heinz)
+)
 Underfull \hbox (badness 10000) in paragraph at lines 186--188
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 189--193
+[2 <./valgrind2.JPG>]
+Underfull \hbox (badness 10000) in paragraph at lines 197--198
 
  []
 
-[2 <./valgrind2.JPG>]
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no ™ in font ptmr7t!
- <a9a9a9.JPG, id=103, 218.31563pt x 355.82938pt>
+<a9a9a9.JPG, id=102, 218.31563pt x 355.82938pt>
 File: a9a9a9.JPG Graphic file (type jpg)
-
-<use a9a9a9.JPG>
-Package pdftex.def Info: a9a9a9.JPG used on input line 203.
+ <use a9a9a9.JPG>
+Package pdftex.def Info: a9a9a9.JPG used on input line 206.
 (pdftex.def)             Requested size: 201.60077pt x 328.58862pt.
- <a15a9.JPG, id=104, 216.30812pt x 346.79562pt>
-File: a15a9.JPG Graphic file (type jpg)
 
-<use a15a9.JPG>
-Package pdftex.def Info: a15a9.JPG used on input line 210.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<a15a9.JPG, id=103, 216.30812pt x 346.79562pt>
+File: a15a9.JPG Graphic file (type jpg)
+ <use a15a9.JPG>
+Package pdftex.def Info: a15a9.JPG used on input line 213.
 (pdftex.def)             Requested size: 201.60077pt x 323.23096pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 
-Overfull \hbox (6.00262pt too wide) in paragraph at lines 241--242
+LaTeX Warning: Reference `fig:printingbad]' on page 3 undefined on input line 2
+21.
+
+
+LaTeX Warning: Reference `fig:printinggood]' on page 3 undefined on input line 
+221.
+
+<printing-bad.png, id=104, 736.7525pt x 584.1825pt>
+File: printing-bad.png Graphic file (type png)
+ <use printing-bad.png>
+Package pdftex.def Info: printing-bad.png used on input line 226.
+(pdftex.def)             Requested size: 249.48138pt x 197.81717pt.
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<printing-good.png, id=105, 741.77126pt x 638.385pt>
+File: printing-good.png Graphic file (type png)
+ <use printing-good.png>
+Package pdftex.def Info: printing-good.png used on input line 233.
+(pdftex.def)             Requested size: 249.48138pt x 214.71019pt.
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2015/06/04 1.6 listings language file
+)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2015/06/04 1.6 listings language file
+)
+Overfull \hbox (6.00262pt too wide) in paragraph at lines 266--267
 [][][][][][][][][][][][][][][][][] 
  []
 
-[3 <./a9a9a9.JPG> <./a15a9.JPG>]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 272.
- [4
-
-]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 272.
- (./bare_jrnl.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 272.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 272.
+[3 <./a9a9a9.JPG>]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 297.
+ [4 <./a15a9.JPG> <./printing-bad.png> <./printing-good.png>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 297.
+(./bare_jrnl.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 297.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 297.
 Package rerunfilecheck Info: File `bare_jrnl.out' has not changed.
-(rerunfilecheck)             Checksum: D5DA7B0CA443D1BCD97E97388CD6CC39;671.
+(rerunfilecheck)             Checksum: 571C869CDA289024A1BC68854D85079A;673.
+
+
+LaTeX Warning: There were undefined references.
+
 Package logreq Info: Writing requests to 'bare_jrnl.run.xml'.
 \openout1 = `bare_jrnl.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 14063 strings out of 493029
- 224744 string characters out of 6136234
- 667833 words of memory out of 5000000
- 17337 multiletter control sequences out of 15000+600000
+ 14379 strings out of 493029
+ 228766 string characters out of 6136234
+ 672166 words of memory out of 5000000
+ 17638 multiletter control sequences out of 15000+600000
  46441 words of font info for 97 fonts, out of 8000000 for 9000
  1144 hyphenation exceptions out of 8191
- 44i,8n,35p,853b,1618s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 44i,8n,51p,881b,1038s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/
@@ -830,10 +863,10 @@ ier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb>
 </usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/share/te
 xlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dis
 t/fonts/type1/urw/times/utmri8a.pfb>
-Output written on bare_jrnl.pdf (4 pages, 403732 bytes).
+Output written on bare_jrnl.pdf (4 pages, 601612 bytes).
 PDF statistics:
- 206 PDF objects out of 1000 (max. 8388607)
- 184 compressed objects within 2 object streams
- 82 named destinations out of 1000 (max. 500000)
- 109 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 213 PDF objects out of 1000 (max. 8388607)
+ 189 compressed objects within 2 object streams
+ 85 named destinations out of 1000 (max. 500000)
+ 119 words of extra memory for PDF output out of 10000 (max. 10000000)
 
