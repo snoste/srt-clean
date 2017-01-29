@@ -61,7 +61,7 @@
 % As a general rule, do not put math, special symbols or citations
 % in the abstract or keywords.
 \begin{abstract}
-Performance evaluation of an application mapped onto multiple cores. The application is ray tracing. The CPU setups used are; ARM A15 and ARM A9 and triple ARM A9 cores. The program it has been divided used a profiler but also just by looking at the application itself. 
+Performance evaluation of an application mapped onto multiple cores. The application is ray tracing. The CPU setups used are: ARM A15 and ARM A9 and triple ARM A9 cores. The program it has been divided used a profiler but also just by looking at the application itself. 
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
@@ -88,7 +88,7 @@ The initial results is shown in figure \ref{fig:valgrind}.
 This results gives the hint of how to divide the code onto the different cores and CPU architecture. This paper is divided onto two main sections, the first part concerning the Gem5 simulator and the Pthread library. The other section explains and evaluates result of using those tools and how it was done.\\
 
  
-\hfill January 27, 2017
+\hfill January 29, 2017
 
 
 \section{Gem5 and Pthread library}
@@ -184,7 +184,7 @@ pthread_join(col_thread_variable[px],
 NULL);
 \end{lstlisting}
 For join the thread to the main one.
-The \(trace_thread\) function was created by adapting the code of the main used for calculate a line of pixel.\\
+The \(trace\_thread\) function was created by adapting the code of the main used for calculate a line of pixel.\\
 
 The code was now ready to be run using the scripts noted on the appendix.
 
@@ -218,7 +218,7 @@ On the other hand, for the triple A9 processor the application was slightly diff
 
 Another feature was added, namely to let the main start printing to the file as soon as the parts are finished. So for example when 10 lines are finished calculating by the main, they are printed to the file and after that point, the first thread is joined. Then wait for it to finish its lines and print then, so forth.
 
-By debugging via printing, is how it was figured out that more calculation was done in the middle. In Figure \ref{fig:printingbad]} and \ref{fig:printinggood]} are some picture of process flow, showed by printing useful messages about the status of the process. 
+By debugging via printing, is how it was figured out that more calculation was done in the middle. In figure \ref{fig:printingbad} and \ref{fig:printinggood} are some picture of process flow, showed by printing useful messages about the status of the process. 
 
 
 \begin{figure}[!h]
@@ -290,7 +290,7 @@ cd /
 
 
 \section{Conclusion}
-It is possible to conclude that the triple A9 has better performance that the A15-A9. This is true depending on how the program is divided onto the three or two cores. Moreover, there are cases where it is not possible to exploit parallelism, in this cases just one core is it used and the A15 one could win due to its characteristic. On the other hand, as in the Jpeg application, where parallelism was possible, it counts more the overall cores power in exploiting better performance. 
+It is possible to conclude that the triple A9 has better performance that the A15-A9. However, the performance of a CPU really rely on multiple factor such as compiler, architecture, how the program is written. Moreover, from our results is it possible to see that the A15-A9 processor was better in running the code without using thread. On the other hand, the optimized code was making the triple A9 execution much faster.
 \end{document}
 
 
